@@ -8,6 +8,7 @@ const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
+const recipeActionsRouter = require('./routes/recipeActions');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/recipes', recipeActionsRouter);
 
 // Try to start with HTTPS using self-signed certificate.
 // In production, HTTPS should ALWAYS be used — never serve over plain HTTP in a live environment.

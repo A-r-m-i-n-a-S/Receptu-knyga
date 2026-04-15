@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mėgstami receptai</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      background: #f4f6f8;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #4a90e2;
+      color: #fff;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    header h1 {
+      font-size: 1.2rem;
+    }
+
+    .back-btn {
+      padding: 0.4rem 0.9rem;
+      background: #fff;
+      color: #4a90e2;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: #e8f0fa;
+    }
+
+    /* ── Recipe grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      padding: 1.5rem;
+    }
+
+    @media (min-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* ── Recipe card ── */
+    .recipe-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .card-star {
+      font-size: 1.3rem;
+      color: #f0a500;
+    }
+
+    .card-category {
+      font-size: 0.85rem;
+      color: #888;
+      text-transform: capitalize;
+    }
+
+    /* ── Card buttons ── */
+    .card-btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: #4a90e2;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .card-btn:hover {
+      background: #357abd;
+    }
+
+    .unfav-btn {
+      padding: 0.5rem 1rem;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .unfav-btn:hover {
+      background: #c0392b;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    /* ── Empty state ── */
+    .no-results {
+      color: #888;
+      padding: 1rem 0;
+      grid-column: 1 / -1;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="back-btn">&larr; Atgal</a>
+    <h1>Mėgstami receptai</h1>
+  </header>
+
+  <!-- Recipe cards are rendered here by JavaScript -->
+  <div class="grid" id="favourites-grid">
+    <p class="no-results">Kraunama...</p>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/recipe-actions.js"></script>
+  <script>
+    // Redirect to login if no token found
+    if (!localStorage.getItem('jwt_token')) {
+      window.location.href = 'login.html';
+    }
+
+    const grid = document.getElementById('favourites-grid');
+
+    // Renders the list of favourite recipes into the grid
+    function renderFavourites(recipes) {
+      // Filter only recipes marked as favourite
+      const favourites = recipes.filter(r => r.is_favourite === 1);
+
+      // Clear the grid
+      grid.innerHTML = '';
+
+      if (favourites.length === 0) {
+        grid.innerHTML = '<p class="no-results">Nėra mėgstamų receptų</p>';
+        return;
+      }
+
+      // Build a card for each favourite recipe
+      favourites.forEach(recipe => {
+        const card = document.createElement('div');
+        card.className = 'recipe-card';
+
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="card-title">${recipe.title}</span>
+            <span class="card-star">&#9733;</span>
+          </div>
+          <span class="card-category">${recipe.category}</span>
+          <div class="card-actions">
+            <a href="recipe.html?id=${recipe.id}" class="card-btn">Peržiūrėti</a>
+            <button class="unfav-btn" data-id="${recipe.id}">Pašalinti iš mėgstamų</button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      // Attach click handlers to all "remove from favourites" buttons
+      document.querySelectorAll('.unfav-btn').forEach(btn => {
+        btn.addEventListener('click', async function () {
+          const id = this.getAttribute('data-id');
+          await toggleFavourite(id);
+          // Reload the full list and re-render after toggling
+          loadFavourites();
+        });
+      });
+    }
+
+    // Fetches all recipes from the API and renders the favourites
+    async function loadFavourites() {
+      const recipes = await apiFetch('/recipes');
+
+      // Handle errors (e.g. token expired — apiFetch already redirects on 401)
+      if (!recipes || recipes.error) {
+        grid.innerHTML = '<p class="no-results">Klaida kraunant receptus</p>';
+        return;
+      }
+
+      renderFavourites(recipes);
+    }
+
+    // Load favourites when the page opens
+    loadFavourites();
+  </script>
+
+</body>
+</html>

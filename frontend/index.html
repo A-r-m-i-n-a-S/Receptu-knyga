@@ -57,6 +57,21 @@
       background: #e8f0fa;
     }
 
+    .header-link {
+      padding: 0.4rem 0.9rem;
+      background: #fff;
+      color: #4a90e2;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    .header-link:hover {
+      background: #e8f0fa;
+    }
+
     /* ── Filters ── */
     .filters {
       display: flex;
@@ -165,6 +180,8 @@
     <h1>Receptų valdymo sistema</h1>
     <div class="header-right">
       <span>Sveiki, <strong id="username-display"></strong></span>
+      <a href="favourites.html" class="header-link">&#9733; Mėgstami</a>
+      <a href="create.html" class="header-link">+ Naujas receptas</a>
       <button id="logout-btn">Atsijungti</button>
     </div>
   </header>
@@ -191,7 +208,7 @@
     <p class="no-results">Kraunama...</p>
   </div>
 
-  <script src="js/api.js"></script>
-  <script src="js/recipes-list.js"></script>
+  <script src="js/api.js?v=2"></script>
+  <script src="js/recipes-list.js?v=2"></script>
 </body>
 </html>
