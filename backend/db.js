@@ -18,9 +18,16 @@ db.exec(`
     ingredients TEXT NOT NULL,
     steps TEXT NOT NULL,
     user_id INTEGER NOT NULL,
-    is_favourite INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS favourites (
+    user_id INTEGER NOT NULL,
+    recipe_id INTEGER NOT NULL,
+    PRIMARY KEY (user_id, recipe_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id)
   );
 `);
 

@@ -85,19 +85,32 @@ router.delete('/:id', authMiddleware, (req, res) => {
   return res.status(200).json({ message: 'Recipe deleted' });
 });
 
-// PATCH /api/recipes/:id/favourite - toggle the favourite status of a recipe
+// PATCH /api/recipes/:id/favourite - toggle the favourite status for the logged-in user
 router.patch('/:id/favourite', authMiddleware, (req, res) => {
   const { id } = req.params;
+  const userId = req.user.userId;
 
-  // Check the recipe exists and belongs to the logged-in user
+  // Check the recipe exists (any user can favourite any recipe)
   const recipe = db.prepare('SELECT * FROM recipes WHERE id = ?').get(id);
-  if (!recipe || recipe.user_id !== req.user.userId) {
-    return res.status(403).json({ error: 'Forbidden' });
+  if (!recipe) {
+    return res.status(404).json({ error: 'Recipe not found' });
   }
 
-  // Toggle: 0 becomes 1, 1 becomes 0
-  const newValue = recipe.is_favourite === 1 ? 0 : 1;
-  db.prepare('UPDATE recipes SET is_favourite = ? WHERE id = ?').run(newValue, id);
+  // Check if this user has already favourited this recipe
+  const existing = db
+    .prepare('SELECT * FROM favourites WHERE user_id = ? AND recipe_id = ?')
+    .get(userId, id);
+
+  let newValue;
+  if (existing) {
+    // Already favourited — remove it
+    db.prepare('DELETE FROM favourites WHERE user_id = ? AND recipe_id = ?').run(userId, id);
+    newValue = 0;
+  } else {
+    // Not favourited yet — add it
+    db.prepare('INSERT INTO favourites (user_id, recipe_id) VALUES (?, ?)').run(userId, id);
+    newValue = 1;
+  }
 
   return res.status(200).json({ message: 'Updated', is_favourite: newValue });
 });
