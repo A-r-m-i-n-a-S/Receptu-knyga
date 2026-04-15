@@ -24,6 +24,8 @@ async function apiFetch(endpoint, method = 'GET', body = null) {
 
   // Redirect to login if token is missing or expired
   if (response.status === 401) {
+    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('username');
     window.location.href = 'login.html';
     return;
   }
