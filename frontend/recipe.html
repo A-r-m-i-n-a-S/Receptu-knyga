@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receptas – Receptų valdymo sistema</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      background: #f4f6f8;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      padding: 0.5rem 1rem;
+      background: #4a90e2;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+    }
+
+    .back-btn:hover {
+      background: #357abd;
+    }
+
+    .recipe-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 2rem;
+    }
+
+    .recipe-title {
+      font-size: 1.6rem;
+      color: #333;
+      margin-bottom: 0.4rem;
+    }
+
+    .recipe-category {
+      font-size: 0.9rem;
+      color: #888;
+      text-transform: capitalize;
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      color: #444;
+      margin-bottom: 0.6rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.3rem;
+    }
+
+    ul {
+      list-style: disc;
+      padding-left: 1.5rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+      color: #555;
+    }
+
+    .steps {
+      white-space: pre-wrap;
+      line-height: 1.8;
+      color: #555;
+    }
+
+    .error-msg {
+      color: #d9534f;
+      padding: 1rem 0;
+    }
+
+    /* Responsive: on small screens reduce padding */
+    @media (max-width: 480px) {
+      .recipe-card {
+        padding: 1.2rem;
+      }
+
+      .recipe-title {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <a href="index.html" class="back-btn">← Grįžti</a>
+
+    <!-- Recipe content renders here -->
+    <div id="recipe-container">
+      <p>Kraunama...</p>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    // Redirect to login if not authenticated
+    if (!localStorage.getItem('jwt_token')) {
+      window.location.href = 'login.html';
+    }
+
+    // Read recipe id from URL query string
+    const params = new URLSearchParams(window.location.search);
+    const recipeId = params.get('id');
+
+    const container = document.getElementById('recipe-container');
+
+    // Loads and displays a single recipe by id
+    async function loadRecipe() {
+      if (!recipeId) {
+        container.innerHTML = '<p class="error-msg">Nenurodytas recepto ID.</p>';
+        return;
+      }
+
+      try {
+        const recipe = await apiFetch(`/recipes/${recipeId}`);
+
+        if (!recipe || recipe.error) {
+          container.innerHTML = '<p class="error-msg">Receptas nerastas.</p>';
+          return;
+        }
+
+        // Parse ingredients JSON array into a list
+        let ingredientsList = '';
+        try {
+          const ingredients = JSON.parse(recipe.ingredients);
+          ingredientsList = ingredients
+            .map((item) => `<li>${item}</li>`)
+            .join('');
+        } catch {
+          // If ingredients is plain text, show as single item
+          ingredientsList = `<li>${recipe.ingredients}</li>`;
+        }
+
+        container.innerHTML = `
+          <div class="recipe-card">
+            <h1 class="recipe-title">${recipe.title}</h1>
+            <p class="recipe-category">${recipe.category}</p>
+
+            <h2>Ingredientai</h2>
+            <ul>${ingredientsList}</ul>
+
+            <h2>Gaminimo būdas</h2>
+            <p class="steps">${recipe.steps}</p>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = '<p class="error-msg">Klaida kraunant receptą.</p>';
+      }
+    }
+
+    loadRecipe();
+  </script>
+</body>
+</html>

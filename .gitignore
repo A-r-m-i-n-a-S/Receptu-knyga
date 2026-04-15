@@ -19,3 +19,7 @@ npm-debug.log*
 # Build artifacts
 build/
 dist/
+
+# SSL certificates (contain private key - never commit these)
+backend/cert.pem
+backend/key.pem

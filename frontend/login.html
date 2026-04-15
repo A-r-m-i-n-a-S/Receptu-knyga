@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prisijungimas – Receptų valdymo sistema</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 0.3rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4a90e2;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.7rem;
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+      background: #357abd;
+    }
+
+    .toggle-link {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .toggle-link a {
+      color: #4a90e2;
+      text-decoration: none;
+    }
+
+    .toggle-link a:hover {
+      text-decoration: underline;
+    }
+
+    .error {
+      color: #d9534f;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    .success {
+      color: #5cb85c;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login section -->
+  <div class="card" id="login-section">
+    <h1>Prisijungimas</h1>
+    <form id="login-form">
+      <label for="login-username">Vartotojo vardas</label>
+      <input type="text" id="login-username" placeholder="Įveskite vardą" required />
+
+      <label for="login-password">Slaptažodis</label>
+      <input type="password" id="login-password" placeholder="Įveskite slaptažodį" required />
+
+      <button type="submit">Prisijungti</button>
+      <p class="error" id="login-error"></p>
+    </form>
+
+    <p class="toggle-link">
+      Neturite paskyros? <a href="#" id="show-register">Registruotis</a>
+    </p>
+  </div>
+
+  <!-- Register section (hidden by default) -->
+  <div class="card hidden" id="register-section">
+    <h1>Registracija</h1>
+    <form id="register-form">
+      <label for="register-username">Vartotojo vardas</label>
+      <input type="text" id="register-username" placeholder="Min. 3 simboliai" required />
+
+      <label for="register-password">Slaptažodis</label>
+      <input type="password" id="register-password" placeholder="Min. 6 simboliai" required />
+
+      <button type="submit">Registruotis</button>
+      <p class="error" id="register-error"></p>
+      <p class="success" id="register-success"></p>
+    </form>
+
+    <p class="toggle-link">
+      Jau turite paskyrą? <a href="#" id="show-login">Prisijungti</a>
+    </p>
+  </div>
+
+  <!-- Shared API helper must load before auth.js -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receptų valdymo sistema</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      background: #f4f6f8;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #4a90e2;
+      color: #fff;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    header h1 {
+      font-size: 1.2rem;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-right span {
+      font-size: 0.95rem;
+    }
+
+    #logout-btn {
+      padding: 0.4rem 0.9rem;
+      background: #fff;
+      color: #4a90e2;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    #logout-btn:hover {
+      background: #e8f0fa;
+    }
+
+    /* ── Filters ── */
+    .filters {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding: 1rem 1.5rem;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .filters input:focus,
+    .filters select:focus {
+      outline: none;
+      border-color: #4a90e2;
+    }
+
+    /* ── Recipe grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;           /* 1 column on phones */
+      gap: 1rem;
+      padding: 1.5rem;
+    }
+
+    @media (min-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+      }
+    }
+
+    @media (min-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on desktop */
+      }
+    }
+
+    /* ── Recipe card ── */
+    .recipe-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .card-star {
+      font-size: 1.3rem;
+      color: #f0a500;
+    }
+
+    .card-category {
+      font-size: 0.85rem;
+      color: #888;
+      text-transform: capitalize;
+    }
+
+    .card-btn {
+      display: inline-block;
+      margin-top: auto;
+      padding: 0.5rem 1rem;
+      background: #4a90e2;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .card-btn:hover {
+      background: #357abd;
+    }
+
+    .no-results {
+      color: #888;
+      padding: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Receptų valdymo sistema</h1>
+    <div class="header-right">
+      <span>Sveiki, <strong id="username-display"></strong></span>
+      <button id="logout-btn">Atsijungti</button>
+    </div>
+  </header>
+
+  <!-- Search and category filters -->
+  <div class="filters">
+    <input
+      type="text"
+      id="search-input"
+      placeholder="Ieškoti pagal pavadinimą..."
+    />
+    <select id="category-select">
+      <option value="">Visos kategorijos</option>
+      <option value="breakfast">Pusryčiai</option>
+      <option value="lunch">Pietūs</option>
+      <option value="dinner">Vakarienė</option>
+      <option value="dessert">Desertas</option>
+      <option value="other">Kita</option>
+    </select>
+  </div>
+
+  <!-- Recipe cards render here -->
+  <div class="grid" id="recipes-grid">
+    <p class="no-results">Kraunama...</p>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/recipes-list.js"></script>
+</body>
+</html>
